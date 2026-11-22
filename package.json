@@ -1,0 +1,7 @@
+{
+  "name": "microshop",
+  "private": true,
+  "workspaces": ["apps/api", "apps/web"],
+  "engines": { "node": ">=22.12.0" },
+  "scripts": { "build": "npm run build --workspaces" }
+}

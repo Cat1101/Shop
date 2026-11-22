@@ -1,0 +1,85 @@
+name: microshop
+
+x-api-build: &api-build
+  context: .
+  target: api
+
+x-database-url: &database-url postgresql://microshop:microshop_local@db:5432/microshop
+
+services:
+  db:
+    image: postgres:17-bookworm
+    environment:
+      POSTGRES_DB: microshop
+      POSTGRES_USER: microshop
+      POSTGRES_PASSWORD: microshop_local
+    volumes:
+      - prisma_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD", "pg_isready", "-h", "127.0.0.1", "-U", "microshop", "-d", "microshop"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+
+  migrate:
+    build: *api-build
+    command:
+      - sh
+      - -ec
+      - |
+        npm run db:migrate --workspace @microshop/api
+        if [ "$${SEED_DEMO}" = true ]; then npm run db:seed --workspace @microshop/api; fi
+    environment:
+      DATABASE_URL: *database-url
+      SEED_DEMO: "${SEED_DEMO:-true}"
+    depends_on:
+      db:
+        condition: service_healthy
+
+  mail:
+    image: axllent/mailpit:v1.34.0
+    ports:
+      - "127.0.0.1:${MAIL_PORT:-8025}:8025"
+
+  api:
+    build: *api-build
+    environment:
+      PORT: 3001
+      DATABASE_URL: *database-url
+      SMTP_HOST: mail
+      SMTP_PORT: 1025
+      MAIL_FROM: MicroShop <no-reply@microshop.test>
+      WEB_ORIGIN: http://localhost:${WEB_PORT:-3000}
+    ports:
+      - "127.0.0.1:${API_PORT:-3001}:3001"
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+      mail:
+        condition: service_started
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3001/api/health').then(r => process.exit(r.ok ? 0 : 1)).catch(() => process.exit(1))"]
+      interval: 5s
+      timeout: 4s
+      retries: 15
+
+  web:
+    build:
+      context: .
+      target: web
+    environment:
+      API_URL: http://api:3001/api
+      AUTH_COOKIE_SECURE: "false"
+    ports:
+      - "127.0.0.1:${WEB_PORT:-3000}:3000"
+    depends_on:
+      api:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3000/').then(r => process.exit(r.ok ? 0 : 1)).catch(() => process.exit(1))"]
+      interval: 5s
+      timeout: 4s
+      retries: 15
+
+volumes:
+  prisma_data:
