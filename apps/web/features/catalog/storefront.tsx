@@ -1,11 +1,29 @@
 'use client';
 
-import Link from 'next/link';
-import { useState } from 'react';
-import { formatPrice } from '../../shared/money';
+import { CircuitBoard, Cpu, Layers3, Radar, Search, SearchX, X } from 'lucide-react';
+import { useRef, useState } from 'react';
+import { ShopHeader } from '../../shared/shop-header';
 import { CartPanel } from '../cart/cart-panel';
 import { useCart } from '../cart/use-cart';
+import { CatalogHero } from './catalog-hero';
 import type { Category, Product } from './model';
+import { ProductCard } from './product-card';
+
+const categoryIcons = {
+  controllers: Cpu,
+  sensors: Radar,
+  modules: CircuitBoard,
+};
+
+const productCount = new Intl.PluralRules('ru');
+
+function productCountLabel(count: number) {
+  switch (productCount.select(count)) {
+    case 'one': return `${count} товар`;
+    case 'few': return `${count} товара`;
+    default: return `${count} товаров`;
+  }
+}
 
 export function Storefront({ categories, products }: {
   categories: Category[];
@@ -13,97 +31,117 @@ export function Storefront({ categories, products }: {
 }) {
   const [category, setCategory] = useState('');
   const [search, setSearch] = useState('');
+  const searchField = useRef<HTMLInputElement>(null);
   const [cartOpen, setCartOpen] = useState(false);
+  const [announcement, setAnnouncement] = useState('');
   const cart = useCart(products);
-
-  const query = search.trim().toLowerCase();
   const categoryNames = new Map(categories.map((item) => [item.slug, item.name]));
-  const visibleProducts = products.filter((product) =>
-    (!category || product.category === category) &&
-    `${product.name} ${product.description}`.toLowerCase().includes(query),
-  );
+  const filters = [{ slug: '', name: 'Все товары' }, ...categories];
+  const query = search.trim().toLocaleLowerCase('ru-RU');
+  const visibleProducts = products.filter((product) => {
+    const name = categoryNames.get(product.category) ?? '';
+    const searchable = `${product.name} ${product.description} ${name}`.toLocaleLowerCase('ru-RU');
+    return (!category || product.category === category) && searchable.includes(query);
+  });
+
+  function addProduct(product: Product) {
+    cart.changeQuantity(product, 1);
+    setAnnouncement(`${product.name} добавлен в корзину`);
+  }
 
   return (
     <>
-      <header className="topbar">
-        <div className="shell topbar-content">
-          <Link className="wordmark" href="/" aria-label="MicroShop, главная">
-            <span className="brand-mark" aria-hidden="true">µ</span> MicroShop
-          </Link>
-          <nav className="header-actions" aria-label="Магазин">
-            <Link className="text-link" href="/account">Аккаунт</Link>
-            <button
-              className="cart-toggle"
-              aria-controls="cart"
-              aria-expanded={cartOpen}
-              onClick={() => setCartOpen(!cartOpen)}
-            >
-              Корзина <span>{cart.count}</span>
-            </button>
-          </nav>
-        </div>
-      </header>
-      <main className="shell">
-        <section className="hero">
-          <h1>Компоненты<br />для электроники</h1>
-          <p>Микроконтроллеры, датчики и модули для ваших проектов.</p>
-        </section>
+      <ShopHeader cart={{ count: cart.count, open: cartOpen, onOpen: () => setCartOpen(true) }} />
+      <main className="shell pt-5 pb-16 sm:pt-8">
+        <CatalogHero />
+        <CartPanel open={cartOpen} cart={cart} onClose={() => setCartOpen(false)} />
+        <div className="sr-only" role="status">{announcement}</div>
 
-        <CartPanel open={cartOpen} cart={cart} />
-
-        <section className="catalog" aria-labelledby="catalog-title">
-          <div className="catalog-heading">
-            <h2 id="catalog-title">Каталог</h2>
-            <input
-              type="search"
-              aria-label="Поиск по каталогу"
-              placeholder="Поиск по каталогу"
-              value={search}
-              onChange={(event) => setSearch(event.target.value)}
-            />
+        <section id="catalog" className="mt-9 scroll-mt-6 sm:mt-12" aria-labelledby="catalog-title">
+          <div className="mb-5 flex flex-wrap items-end justify-between gap-4">
+            <div>
+              <h2 id="catalog-title" className="text-4xl font-extrabold tracking-[-0.055em] sm:text-[2.85rem]">
+                Каталог
+              </h2>
+              <p className="mt-1 text-sm font-bold text-muted" aria-live="polite">
+                {productCountLabel(visibleProducts.length)}
+              </p>
+            </div>
+            <div className="relative w-full sm:max-w-xs">
+              <Search size={19} className="pointer-events-none absolute top-1/2 left-3.5 -translate-y-1/2 text-muted" aria-hidden="true" />
+              <input
+                className="field pr-12 pl-11 [&::-webkit-search-cancel-button]:appearance-none"
+                ref={searchField}
+                type="search"
+                aria-label="Поиск по каталогу"
+                placeholder="Поиск по каталогу"
+                value={search}
+                onChange={(event) => setSearch(event.target.value)}
+              />
+              {search && (
+                <button
+                  type="button"
+                  className="absolute top-1/2 right-1 grid size-11 -translate-y-1/2 cursor-pointer place-items-center rounded-lg text-muted transition-colors hover:bg-tint hover:text-cobalt active:bg-indigo-200"
+                  aria-label="Очистить поиск"
+                  onClick={() => {
+                    setSearch('');
+                    searchField.current?.focus();
+                  }}
+                >
+                  <X size={18} aria-hidden="true" />
+                </button>
+              )}
+            </div>
           </div>
-          <div className="filters" role="group" aria-label="Категории">
-            <button aria-pressed={!category} onClick={() => setCategory('')}>Все товары</button>
-            {categories.map((item) => (
-              <button
-                key={item.slug}
-                aria-pressed={category === item.slug}
-                onClick={() => setCategory(item.slug)}
-              >
-                {item.name}
-              </button>
-            ))}
-          </div>
-          {visibleProducts.length === 0 && <p role="status">Товары не найдены.</p>}
-          <div className="product-grid">
-            {visibleProducts.map((product) => {
-              const quantity = cart.quantities[product.slug] ?? 0;
-              const atLimit = quantity >= Math.min(product.stock, 100);
+          <div className="mb-5 flex flex-wrap gap-2" role="group" aria-label="Категории">
+            {filters.map((item) => {
+              const Icon = categoryIcons[item.slug as keyof typeof categoryIcons] ?? Layers3;
+              const selected = category === item.slug;
               return (
-                <article className="product" key={product.slug}>
-                  <p className="category">{categoryNames.get(product.category)}</p>
-                  <h3>{product.name}</h3>
-                  <p className="description">{product.description}</p>
-                  <div className="product-footer">
-                    <div>
-                      <strong>{formatPrice(product.priceKopecks)}</strong>
-                      <p className="stock">
-                        {product.stock > 0 ? `В наличии: ${product.stock} шт.` : 'Нет в наличии'}
-                      </p>
-                    </div>
-                    <button
-                      className="primary"
-                      onClick={() => cart.changeQuantity(product, 1)}
-                      disabled={atLimit}
-                      aria-label={`Добавить ${product.name} в корзину`}
-                    >
-                      {product.stock > 0 && atLimit ? 'В корзине' : 'В корзину'}
-                    </button>
-                  </div>
-                </article>
+                <button
+                  key={item.slug}
+                  type="button"
+                  className={`control ${selected ? 'control-selected' : 'control-secondary'}`}
+                  aria-pressed={selected}
+                  onClick={() => setCategory(item.slug)}
+                >
+                  <Icon size={17} aria-hidden="true" />
+                  {item.name}
+                </button>
               );
             })}
           </div>
+          {visibleProducts.length === 0 ? (
+            <div className="rounded-xl border border-dashed border-slate-300 bg-white px-5 py-10 text-center">
+              <SearchX className="mx-auto mb-3 text-cobalt" size={29} aria-hidden="true" />
+              <p className="text-lg font-extrabold">Товары не найдены</p>
+              {(query || category) && (
+                <button
+                  type="button"
+                  className="control control-secondary mt-4"
+                  onClick={() => {
+                    setSearch('');
+                    setCategory('');
+                  }}
+                >
+                  Сбросить поиск и фильтры
+                </button>
+              )}
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {visibleProducts.map((product) => (
+                <ProductCard
+                  key={product.slug}
+                  product={product}
+                  category={categoryNames.get(product.category)}
+                  quantity={cart.quantities[product.slug] ?? 0}
+                  onAdd={() => addProduct(product)}
+                  onOpenCart={() => setCartOpen(true)}
+                />
+              ))}
+            </div>
+          )}
         </section>
       </main>
     </>

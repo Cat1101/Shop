@@ -1,9 +1,9 @@
 import { randomUUID } from 'node:crypto';
-import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { getViewer } from '../../features/account/session';
 import { fetchProducts } from '../../features/catalog/data';
 import { CheckoutForm } from '../../features/checkout/checkout-form';
+import { DetailLayout } from '../../shared/detail-layout';
 
 export default async function Checkout() {
   if (!(await getViewer())) {
@@ -11,11 +11,8 @@ export default async function Checkout() {
   }
 
   return (
-    <main className="shell detail-page">
-      <Link className="text-link" href="/">К каталогу</Link>
-      <section className="detail-card">
-        <CheckoutForm products={await fetchProducts()} requestId={randomUUID()} />
-      </section>
-    </main>
+    <DetailLayout wide>
+      <CheckoutForm products={await fetchProducts()} requestId={randomUUID()} />
+    </DetailLayout>
   );
 }
