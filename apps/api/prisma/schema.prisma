@@ -1,0 +1,97 @@
+generator client {
+  provider            = "prisma-client"
+  output              = "../src/generated/prisma"
+  moduleFormat        = "cjs"
+  importFileExtension = "js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Category {
+  id       Int       @id @default(autoincrement())
+  slug     String    @unique @db.VarChar(80)
+  name     String
+  products Product[]
+}
+
+model Product {
+  id           Int         @id @default(autoincrement())
+  categoryId   Int
+  category     Category    @relation(fields: [categoryId], references: [id])
+  slug         String      @unique @db.VarChar(80)
+  name         String
+  description  String
+  priceKopecks Int
+  stock        Int
+  orderItems   OrderItem[]
+
+  @@index([categoryId])
+}
+
+model User {
+  id                 Int                 @id @default(autoincrement())
+  email              String              @unique @db.VarChar(254)
+  passwordHash       String
+  verifiedAt         DateTime?
+  createdAt          DateTime            @default(now())
+  emailVerifications EmailVerification[]
+  sessions           Session[]
+  orders             Order[]
+}
+
+model EmailVerification {
+  tokenHash    String   @id
+  passwordHash String
+  userId       Int
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt    DateTime
+
+  @@index([userId, expiresAt])
+}
+
+model Session {
+  tokenHash String   @id
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt DateTime
+
+  @@index([userId, expiresAt])
+}
+
+enum OrderStatus {
+  PLACED
+}
+
+model Order {
+  id           String      @id @default(uuid()) @db.Uuid
+  userId       Int
+  user         User        @relation(fields: [userId], references: [id])
+  requestId    String      @db.Uuid
+  customerName String
+  phone        String
+  status       OrderStatus @default(PLACED)
+  totalKopecks Int
+  createdAt    DateTime    @default(now())
+  items        OrderItem[]
+
+  @@unique([userId, requestId])
+  @@index([userId, createdAt])
+}
+
+model OrderItem {
+  orderId      String  @db.Uuid
+  order        Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  productId    Int
+  product      Product @relation(fields: [productId], references: [id])
+  productName  String
+  priceKopecks Int
+  quantity     Int
+
+  @@id([orderId, productId])
+}
+
+model SeedRun {
+  name String @id
+}
