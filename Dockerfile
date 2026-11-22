@@ -25,5 +25,6 @@ FROM base AS web
 ENV NODE_ENV=production HOSTNAME=0.0.0.0
 COPY --from=web-build --chown=node:node /app/apps/web/.next/standalone ./
 COPY --from=web-build --chown=node:node /app/apps/web/.next/static ./apps/web/.next/static
+COPY --from=web-build --chown=node:node /app/apps/web/public ./apps/web/public
 USER node
 CMD ["node", "apps/web/server.js"]
