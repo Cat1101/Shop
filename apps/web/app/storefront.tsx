@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import type { Category, Product } from './catalog';
 
@@ -81,14 +82,17 @@ export function Storefront({ categories, products }: {
           <a className="wordmark" href="/" aria-label="MicroShop, главная">
             <span className="brand-mark" aria-hidden="true">µ</span> MicroShop
           </a>
-          <button
-            className="cart-toggle"
-            aria-controls="cart"
-            aria-expanded={cartOpen}
-            onClick={() => setCartOpen(!cartOpen)}
-          >
-            Корзина <span>{cartCount}</span>
-          </button>
+          <nav className="header-actions" aria-label="Магазин">
+            <Link className="text-link" href="/account">Аккаунт</Link>
+            <button
+              className="cart-toggle"
+              aria-controls="cart"
+              aria-expanded={cartOpen}
+              onClick={() => setCartOpen(!cartOpen)}
+            >
+              Корзина <span>{cartCount}</span>
+            </button>
+          </nav>
         </div>
       </header>
       <main className="shell">
