@@ -1,40 +1,104 @@
+'use client';
+
+import { Minus, Plus, ShoppingBag, X } from 'lucide-react';
 import Link from 'next/link';
+import { useEffect, useRef } from 'react';
 import { formatPrice } from '../../shared/money';
 import type { Cart } from './use-cart';
 
-export function CartPanel({ open, cart }: { open: boolean; cart: Cart }) {
+export function CartPanel({ open, cart, onClose }: { open: boolean; cart: Cart; onClose: () => void }) {
+  const dialog = useRef<HTMLDialogElement>(null);
+
+  useEffect(() => {
+    const element = dialog.current;
+    if (open && !element?.open) {
+      element?.showModal();
+    } else if (!open && element?.open) {
+      element.close();
+    }
+  }, [open]);
+
   return (
-    <section id="cart" className="cart-panel" hidden={!open} aria-labelledby="cart-title">
-      <h2 id="cart-title">Корзина</h2>
-      {cart.lines.length === 0 ? (
-        <p>Корзина пока пуста.</p>
-      ) : (
-        <>
-          <ul className="cart-list">
-            {cart.lines.map(({ product, quantity }) => (
-              <li key={product.slug}>
-                <span>{product.name}</span>
-                <div className="quantity">
-                  <button
-                    onClick={() => cart.changeQuantity(product, -1)}
-                    aria-label={`Убрать одну единицу ${product.name}`}
-                  >−</button>
-                  <span>{quantity}</span>
-                  <button
-                    onClick={() => cart.changeQuantity(product, 1)}
-                    disabled={quantity >= Math.min(product.stock, 100)}
-                    aria-label={`Добавить одну единицу ${product.name}`}
-                  >+</button>
-                </div>
-              </li>
-            ))}
-          </ul>
-          <p className="total">
-            <strong>Итого {formatPrice(cart.totalKopecks)}</strong>
-            <Link className="primary" href="/checkout">Оформить заказ</Link>
-          </p>
-        </>
-      )}
-    </section>
+    <dialog
+      id="cart"
+      ref={dialog}
+      className="cart-dialog fixed inset-y-0 right-0 left-auto m-0 h-dvh max-h-none w-full max-w-md bg-white text-ink shadow-2xl backdrop:bg-hero/45"
+      aria-labelledby="cart-title"
+      onClose={onClose}
+      onClick={(event) => {
+        if (event.target === event.currentTarget) {
+          onClose();
+        }
+      }}
+    >
+      <div className="flex h-full flex-col">
+        <header className="flex items-center justify-between gap-3 border-b border-line px-5 py-4 sm:px-7">
+          <h2 id="cart-title" className="text-2xl font-extrabold tracking-tight">Корзина</h2>
+          <button type="button" className="control control-secondary w-11 px-0" aria-label="Закрыть корзину" onClick={onClose}>
+            <X size={19} aria-hidden="true" />
+          </button>
+        </header>
+
+        {cart.lines.length === 0 ? (
+          <div className="grid flex-1 place-content-center justify-items-center gap-4 p-6 text-center">
+            <span className="grid size-14 place-items-center rounded-xl bg-tint text-cobalt">
+              <ShoppingBag size={25} aria-hidden="true" />
+            </span>
+            <p className="text-lg font-extrabold">Корзина пока пуста</p>
+            <button type="button" className="control control-primary" onClick={onClose}>
+              Продолжить покупки
+            </button>
+          </div>
+        ) : (
+          <>
+            <ul className="flex-1 divide-y divide-line overflow-y-auto overscroll-contain px-5 sm:px-7">
+              {cart.lines.map(({ product, quantity }) => (
+                <li key={product.slug} className="flex flex-wrap items-center justify-between gap-x-3 gap-y-2 py-4">
+                  <div className="min-w-0">
+                    <p className="font-extrabold">{product.name}</p>
+                    <p className="mt-1 text-sm font-bold text-muted tabular-nums">
+                      {formatPrice(product.priceKopecks * quantity)}
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <button
+                      type="button"
+                      className="control control-secondary w-11 px-0"
+                      onClick={() => cart.changeQuantity(product, -1)}
+                      aria-label={`Убрать одну единицу ${product.name}`}
+                    >
+                      <Minus size={16} aria-hidden="true" />
+                    </button>
+                    <span className="min-w-6 text-center text-sm font-extrabold tabular-nums" aria-live="polite">
+                      {quantity}
+                    </span>
+                    <button
+                      type="button"
+                      className="control control-secondary w-11 px-0"
+                      onClick={() => cart.changeQuantity(product, 1)}
+                      disabled={quantity >= Math.min(product.stock, 100)}
+                      aria-label={`Добавить одну единицу ${product.name}`}
+                    >
+                      <Plus size={16} aria-hidden="true" />
+                    </button>
+                  </div>
+                </li>
+              ))}
+            </ul>
+            <div className="border-t border-line bg-paper px-5 py-5 sm:px-7">
+              <div className="mb-4 flex items-baseline justify-between gap-3">
+                <span className="font-bold">Итого</span>
+                <strong className="text-2xl font-extrabold tabular-nums" aria-live="polite">
+                  {formatPrice(cart.totalKopecks)}
+                </strong>
+              </div>
+              <Link className="control control-primary w-full" href="/checkout" onClick={onClose}>
+                Оформить заказ
+              </Link>
+            </div>
+          </>
+        )}
+      </div>
+    </dialog>
   );
 }
