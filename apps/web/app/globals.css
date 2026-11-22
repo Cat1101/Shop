@@ -182,3 +182,14 @@ input::placeholder { color: var(--muted); }
 .details-form p { margin: 0; }
 
 .form-error { color: #ffafa5; }
+
+.order-history { margin-bottom: 0; padding: 0; list-style: none; }
+
+.order-history > li + li { border-top: 1px solid var(--line); margin-top: 1rem; }
+
+.order-id { color: var(--muted); overflow-wrap: anywhere; }
+
+@media (max-width: 25rem) {
+  .topbar-content, .header-actions { gap: .45rem; }
+  .cart-toggle { padding-inline: .45rem; }
+}

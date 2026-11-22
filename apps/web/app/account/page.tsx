@@ -1,7 +1,9 @@
 import Link from 'next/link';
 import { AccountForm } from '../../features/account/account-form';
 import { logoutAccount } from '../../features/account/actions';
-import { getViewer } from '../../features/account/session';
+import { getViewer, readSession } from '../../features/account/session';
+import { getOrders } from '../../features/checkout/orders';
+import { OrderHistory } from '../../features/checkout/order-history';
 
 interface Props {
   searchParams: Promise<{ register?: string; next?: string }>;
@@ -9,7 +11,9 @@ interface Props {
 
 export default async function Account({ searchParams }: Props) {
   const { register, next } = await searchParams;
-  const viewer = await getViewer();
+  const token = await readSession();
+  const viewer = token ? await getViewer() : null;
+  const orders = token && viewer ? await getOrders(token) : [];
   const nextQuery = next === 'checkout' ? 'next=checkout' : '';
   const loginUrl = nextQuery ? `/account?${nextQuery}` : '/account';
   const registerUrl = nextQuery ? `/account?register=1&${nextQuery}` : '/account?register=1';
@@ -34,6 +38,7 @@ export default async function Account({ searchParams }: Props) {
           </>
         )}
       </section>
+      {viewer && <OrderHistory orders={orders} />}
     </main>
   );
 }

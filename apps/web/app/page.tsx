@@ -1,5 +1,5 @@
-import { fetchCatalog } from './catalog';
-import { Storefront } from './storefront';
+import { fetchCatalog } from '../features/catalog/data';
+import { Storefront } from '../features/catalog/storefront';
 
 export const dynamic = 'force-dynamic';
 
