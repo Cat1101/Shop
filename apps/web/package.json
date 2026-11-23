@@ -17,6 +17,7 @@
     "@types/node": "^22.0.0",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
+    "@yandex/ymaps3-types": "^1.0.22020827",
     "postcss": "^8.5.33",
     "tailwindcss": "^4.3.5",
     "typescript": "~5.9.3"
