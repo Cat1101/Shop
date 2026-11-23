@@ -28,8 +28,8 @@ export function CheckoutForm({ products, requestId }: {
 
   if (state.order) {
     return (
-      <section className="detail-card max-w-2xl border-t-4 border-t-cobalt">
-        <CircleCheck size={32} className="mb-4 text-cobalt" aria-hidden="true" />
+      <section className="detail-card max-w-2xl border-t-4 border-t-accent">
+        <CircleCheck size={32} className="mb-4 text-accent" aria-hidden="true" />
         <div role="status">
           <h1 className="text-3xl font-extrabold tracking-tight">Заказ принят</h1>
         </div>
@@ -42,7 +42,7 @@ export function CheckoutForm({ products, requestId }: {
   if (lines.length === 0) {
     return (
       <section className="detail-card max-w-2xl">
-        <ShoppingBag size={28} className="mb-4 text-cobalt" aria-hidden="true" />
+        <ShoppingBag size={28} className="mb-4 text-accent" aria-hidden="true" />
         <h1 className="text-3xl font-extrabold tracking-tight">Оформление заказа</h1>
         <p className="mt-3 text-muted">Корзина пока пуста.</p>
         <Link className="control control-primary mt-6" href="/#catalog">Выбрать товары</Link>
@@ -53,7 +53,7 @@ export function CheckoutForm({ products, requestId }: {
   const items = lines.map(({ product, quantity }) => ({ slug: product.slug, quantity }));
   return (
     <>
-      <h1 className="mb-5 text-3xl font-extrabold tracking-[-0.05em] sm:text-4xl">Оформление заказа</h1>
+      <h1 className="mb-7 text-4xl font-medium tracking-[-0.06em] sm:text-5xl">Оформление заказа</h1>
       <div className="grid items-start gap-4 md:grid-cols-[minmax(0,1fr)_minmax(0,0.8fr)] md:gap-5">
         <section className="detail-card">
           <h2 className="mb-5 text-xl font-extrabold">Контактные данные</h2>
@@ -90,12 +90,12 @@ export function CheckoutForm({ products, requestId }: {
             {state.error && <p className="form-error" role="alert">{state.error}</p>}
           </form>
         </section>
-        <section className="detail-card">
-          <h2 className="text-xl font-extrabold">Ваш заказ</h2>
+        <section className="order-summary detail-card">
+          <h2 className="text-2xl font-medium tracking-tight">Ваш заказ</h2>
           <ul className="my-3 divide-y divide-line">
             {lines.map(({ product, quantity }) => (
               <li key={product.slug} className="flex justify-between gap-3 py-3 text-sm">
-                <span>{product.name} × {quantity}</span>
+                <span className="font-mono">{product.name} × {quantity}</span>
                 <strong className="shrink-0 tabular-nums">{formatPrice(product.priceKopecks * quantity)}</strong>
               </li>
             ))}
@@ -104,8 +104,8 @@ export function CheckoutForm({ products, requestId }: {
             <span className="font-bold">Итого</span>
             <strong className="text-2xl font-extrabold tabular-nums">{formatPrice(totalKopecks)}</strong>
           </div>
-          <p className="mt-4 flex items-center gap-2 rounded-lg bg-tint p-3 text-sm font-bold">
-            <MapPin className="shrink-0 text-cobalt" size={19} aria-hidden="true" />
+          <p className="mt-4 flex items-center gap-2 border-t border-white/25 pt-4 text-sm">
+            <MapPin className="shrink-0 text-[#ff8652]" size={19} aria-hidden="true" />
             Самовывоз и оплата при получении
           </p>
         </section>

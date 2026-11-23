@@ -1,23 +1,13 @@
-const artPositions: Record<string, string> = {
-  'esp32-devkit': 'bg-left-top',
-  'raspberry-pi-pico': 'bg-top',
-  bme280: 'bg-right-top',
-  'hc-sr04': 'bg-left-bottom',
-  ssd1306: 'bg-bottom',
-  lm2596: 'bg-right-bottom',
+const positions: Record<string, string> = {
+  'esp32-devkit': '0% 0%',
+  'raspberry-pi-pico': '50% 0%',
+  bme280: '100% 0%',
+  'hc-sr04': '0% 100%',
+  ssd1306: '50% 100%',
+  lm2596: '100% 100%',
 };
 
 export function ProductArt({ slug }: { slug: string }) {
-  const position = artPositions[slug];
-  if (!position) {
-    return null;
-  }
-
-  return (
-    <div aria-hidden="true" className="relative aspect-[4/3] overflow-hidden border-b border-line bg-tint">
-      <div
-        className={`absolute inset-x-0 top-1/2 aspect-square -translate-y-1/2 bg-[url('/images/catalog.webp')] bg-size-[300%_200%] bg-no-repeat ${position}`}
-      />
-    </div>
-  );
+  const position = positions[slug];
+  return position ? <span className="product-art" aria-hidden="true" style={{ backgroundPosition: position }} /> : null;
 }

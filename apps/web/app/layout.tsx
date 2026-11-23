@@ -1,4 +1,6 @@
-import '@fontsource-variable/manrope';
+import '@fontsource-variable/rubik';
+import '@fontsource/ibm-plex-mono/400.css';
+import '@fontsource/ibm-plex-mono/500.css';
 import type { Metadata } from 'next';
 import type { ReactNode } from 'react';
 import './globals.css';

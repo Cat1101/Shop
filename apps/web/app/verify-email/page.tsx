@@ -13,8 +13,8 @@ export default async function VerifyEmail({ searchParams }: {
 
   return (
     <DetailLayout>
-      <section className="detail-card mx-auto grid max-w-lg justify-items-start gap-4 border-t-4 border-t-cobalt">
-        <span className="grid size-11 place-items-center rounded-lg bg-tint text-cobalt">
+      <section className="detail-card mx-auto grid max-w-lg justify-items-start gap-4 border-t-4 border-t-accent">
+        <span className="grid size-11 place-items-center rounded-lg bg-tint text-accent">
           <MailCheck size={23} aria-hidden="true" />
         </span>
         <h1 className="text-3xl font-extrabold tracking-tight">Подтверждение почты</h1>

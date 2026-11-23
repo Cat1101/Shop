@@ -24,7 +24,7 @@ function initialLocation(points: PickupPoint[]): YMapLocationRequest {
   };
 }
 
-const markerClass = 'pickup-marker grid size-11 cursor-pointer place-items-center rounded-full border-2 border-white bg-cobalt font-extrabold text-white shadow-lg hover:bg-cobalt-hover focus-visible:outline-cobalt-pressed active:bg-cobalt-pressed aria-pressed:bg-hero';
+const markerClass = 'pickup-marker grid size-11 cursor-pointer place-items-center rounded-full border-2 border-white bg-accent font-extrabold text-white shadow-lg hover:bg-accent-hover focus-visible:outline-accent-pressed active:bg-accent-pressed aria-pressed:bg-hero';
 
 interface Marker {
   entity: YMapMarker;
@@ -137,8 +137,8 @@ export function YandexMap({ mapKey, points, selectedId, onSelect }: Props) {
         <div className="absolute inset-0 grid place-items-center p-5">
           <div role="status" className="max-w-sm rounded-xl border border-line bg-white px-5 py-4 text-center shadow-sm">
             {unavailable
-              ? <MapPin size={25} className="mx-auto mb-2 text-cobalt" aria-hidden="true" />
-              : <LoaderCircle size={25} className="mx-auto mb-2 text-cobalt motion-safe:animate-spin" aria-hidden="true" />}
+              ? <MapPin size={25} className="mx-auto mb-2 text-accent" aria-hidden="true" />
+              : <LoaderCircle size={25} className="mx-auto mb-2 text-accent motion-safe:animate-spin" aria-hidden="true" />}
             <p className="font-extrabold">
               {unavailable ? 'Карта временно недоступна' : 'Загружаем карту…'}
             </p>

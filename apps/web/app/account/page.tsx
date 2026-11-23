@@ -37,8 +37,8 @@ export default async function Account({ searchParams }: Props) {
           <OrderHistory orders={orders} />
         </>
       ) : (
-        <section className="detail-card mx-auto max-w-md border-t-4 border-t-cobalt">
-          <span className="mb-4 grid size-11 place-items-center rounded-lg bg-tint text-cobalt">
+        <section className="detail-card mx-auto max-w-md border-t-4 border-t-accent">
+          <span className="mb-4 grid size-11 place-items-center rounded-lg bg-tint text-accent">
             <UserRound size={23} aria-hidden="true" />
           </span>
           <h1 className="mb-6 text-3xl font-extrabold tracking-tight">

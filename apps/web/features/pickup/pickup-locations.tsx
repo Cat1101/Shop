@@ -57,10 +57,10 @@ export function PickupLocations({ points, mapKey }: {
                 <button
                   type="button"
                   onClick={(event) => selectPoint(point.id, event.currentTarget)}
-                  className="flex w-full cursor-pointer items-center gap-3 rounded-lg border border-line p-3 text-left transition-colors hover:border-cobalt hover:bg-tint active:bg-indigo-200 aria-pressed:border-cobalt aria-pressed:bg-tint"
+                  className="flex w-full cursor-pointer items-center gap-3 rounded-lg border border-line p-3 text-left transition-colors hover:border-accent hover:bg-tint active:bg-tint aria-pressed:border-accent aria-pressed:bg-tint"
                   aria-pressed={selectedId === point.id}
                 >
-                  <span aria-hidden="true" className="grid size-8 shrink-0 place-items-center rounded-full bg-tint text-sm font-extrabold text-cobalt">
+                  <span aria-hidden="true" className="grid size-8 shrink-0 place-items-center rounded-full bg-tint text-sm font-extrabold text-accent">
                     {index + 1}
                   </span>
                   <span className="grid min-w-0 gap-1">
@@ -103,14 +103,14 @@ export function PickupLocations({ points, mapKey }: {
 
             <dl className="mt-5 grid gap-4 border-t border-line pt-5">
               <div className="flex gap-3">
-                <MapPin size={19} className="mt-0.5 shrink-0 text-cobalt" aria-hidden="true" />
+                <MapPin size={19} className="mt-0.5 shrink-0 text-accent" aria-hidden="true" />
                 <div>
                   <dt className="text-sm font-extrabold">Адрес</dt>
                   <dd className="mt-0.5 text-muted">{selected.address}</dd>
                 </div>
               </div>
               <div className="flex gap-3">
-                <Clock3 size={19} className="mt-0.5 shrink-0 text-cobalt" aria-hidden="true" />
+                <Clock3 size={19} className="mt-0.5 shrink-0 text-accent" aria-hidden="true" />
                 <div>
                   <dt className="text-sm font-extrabold">Часы работы</dt>
                   <dd className="mt-0.5 whitespace-pre-line text-muted">{selected.hours}</dd>
@@ -118,7 +118,7 @@ export function PickupLocations({ points, mapKey }: {
               </div>
               {selected.instructions && (
                 <div className="flex gap-3">
-                  <Footprints size={19} className="mt-0.5 shrink-0 text-cobalt" aria-hidden="true" />
+                  <Footprints size={19} className="mt-0.5 shrink-0 text-accent" aria-hidden="true" />
                   <div>
                     <dt className="text-sm font-extrabold">Как пройти</dt>
                     <dd className="mt-0.5 whitespace-pre-line text-muted">{selected.instructions}</dd>
@@ -127,7 +127,7 @@ export function PickupLocations({ points, mapKey }: {
               )}
               {selected.phone && (
                 <div className="flex gap-3">
-                  <Phone size={19} className="mt-0.5 shrink-0 text-cobalt" aria-hidden="true" />
+                  <Phone size={19} className="mt-0.5 shrink-0 text-accent" aria-hidden="true" />
                   <div>
                     <dt className="text-sm font-extrabold">Телефон</dt>
                     <dd>

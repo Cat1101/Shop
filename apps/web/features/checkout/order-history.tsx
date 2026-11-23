@@ -19,7 +19,7 @@ export function OrderHistory({ orders }: { orders: Order[] }) {
             <li key={order.id} className="py-4 last:pb-0">
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <h3 className="font-extrabold">Заказ от {formatDate.format(new Date(order.createdAt))}</h3>
-                <p className="rounded-md bg-tint px-2.5 py-1 text-xs font-extrabold text-cobalt-pressed">Принят</p>
+                <p className="rounded-md bg-tint px-2.5 py-1 text-xs font-extrabold text-accent-pressed">Принят</p>
               </div>
               <p className="mt-1 font-mono text-xs break-all text-muted">{order.id}</p>
               <p className="mt-2 text-sm text-muted">Самовывоз · Оплата при получении</p>

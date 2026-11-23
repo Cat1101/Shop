@@ -6,7 +6,7 @@ export function DetailLayout({ children, wide = false }: { children: ReactNode; 
   return (
     <>
       <ShopHeader />
-      <main className={`shell py-7 sm:py-12 ${wide ? 'max-w-6xl' : 'max-w-3xl'}`}>
+      <main className={`shell detail-enter py-7 sm:py-12 ${wide ? 'max-w-6xl' : 'max-w-3xl'}`}>
         <Link className="text-link mb-4 text-sm" href="/#catalog">К каталогу</Link>
         {children}
       </main>
