@@ -108,3 +108,24 @@
 @keyframes backdrop-enter {
   from { opacity: 0; }
 }
+
+.pickup-marker {
+  translate: -50% -50%;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .pickup-detail {
+    --pickup-panel-from: translateY(100%);
+    animation: pickup-panel-enter 220ms ease-out;
+  }
+}
+
+@media (width >= 64rem) {
+  .pickup-detail {
+    --pickup-panel-from: translateX(-100%);
+  }
+}
+
+@keyframes pickup-panel-enter {
+  from { transform: var(--pickup-panel-from); }
+}

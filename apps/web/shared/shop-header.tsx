@@ -1,4 +1,4 @@
-import { CircuitBoard, ShoppingBag, UserRound } from 'lucide-react';
+import { CircuitBoard, MapPin, ShoppingBag, UserRound } from 'lucide-react';
 import Link from 'next/link';
 
 interface CartControl {
@@ -7,7 +7,7 @@ interface CartControl {
   onOpen: () => void;
 }
 
-export function ShopHeader({ cart }: { cart?: CartControl }) {
+export function ShopHeader({ cart, currentPage }: { cart?: CartControl; currentPage?: 'pickup' }) {
   return (
     <header className="border-b border-line bg-white">
       <div className="shell flex min-h-[4.5rem] items-center justify-between gap-2 sm:gap-5">
@@ -21,9 +21,18 @@ export function ShopHeader({ cart }: { cart?: CartControl }) {
           </span>
           MicroShop
         </Link>
-        <nav className="flex items-center gap-2 sm:gap-3" aria-label="Магазин">
+        <nav className="flex items-center gap-2 max-[360px]:gap-1 sm:gap-3" aria-label="Магазин">
           <Link href="/#catalog" className="text-link mr-3 hidden text-sm text-ink sm:inline-flex">
             Каталог
+          </Link>
+          <Link
+            href="/pickup"
+            className={`control px-2.5 sm:px-3.5 ${currentPage === 'pickup' ? 'control-selected' : 'control-secondary'}`}
+            aria-label="Самовывоз"
+            aria-current={currentPage === 'pickup' ? 'page' : undefined}
+          >
+            <MapPin size={17} aria-hidden="true" />
+            <span className="hidden sm:inline">Самовывоз</span>
           </Link>
           <Link href="/account" className="control control-secondary px-2.5 sm:px-3.5" aria-label="Аккаунт">
             <UserRound size={17} aria-hidden="true" />
