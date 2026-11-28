@@ -1,4 +1,5 @@
 import { BadRequestException } from '@nestjs/common';
+import { normalizeEmail } from '../auth/auth.input';
 
 const slugPattern = /^[a-z0-9-]{1,80}$/;
 const uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
@@ -49,3 +50,13 @@ export function readOrder(body: unknown) {
 }
 
 export type OrderInput = ReturnType<typeof readOrder>;
+
+export function readGuestOrder(body: unknown) {
+  const order = readOrder(body);
+  const { guestKey, email } = body as Record<string, unknown>;
+  const contactEmail = normalizeEmail(email);
+  if (typeof guestKey !== 'string' || !uuidPattern.test(guestKey) || contactEmail === null) {
+    throw new BadRequestException('INVALID_GUEST_CONTACT');
+  }
+  return { order, guestKey, email: contactEmail };
+}

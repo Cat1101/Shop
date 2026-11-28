@@ -3,6 +3,8 @@ import { Database } from '../database/database.service';
 import { Prisma } from '../generated/prisma/client';
 import type { OrderInput } from './order.input';
 
+type OrderOwner = { userId: number } | { guestKey: string; email: string };
+
 const publicOrder = {
   id: true,
   status: true,
@@ -10,7 +12,13 @@ const publicOrder = {
   createdAt: true,
   items: {
     orderBy: { productId: 'asc' },
-    select: { productId: true, productName: true, priceKopecks: true, quantity: true },
+    select: {
+      productId: true,
+      productName: true,
+      priceKopecks: true,
+      quantity: true,
+      product: { select: { slug: true } },
+    },
   },
 } satisfies Prisma.OrderSelect;
 
@@ -26,9 +34,11 @@ export class OrdersService {
     });
   }
 
-  async place(userId: number, input: OrderInput) {
-    const key = { userId, requestId: input.requestId };
-    const where = { userId_requestId: key };
+  async place(owner: OrderOwner, input: OrderInput) {
+    const { requestId } = input;
+    const where = 'userId' in owner
+      ? { userId_requestId: { userId: owner.userId, requestId } }
+      : { guestKey_requestId: { guestKey: owner.guestKey, requestId } };
     const existing = await this.database.order.findUnique({ where, select: publicOrder });
     if (existing) {
       return existing;
@@ -36,7 +46,7 @@ export class OrdersService {
 
     try {
       return await this.database.$transaction((transaction) =>
-        this.placeWithinTransaction(transaction, userId, input),
+        this.placeWithinTransaction(transaction, owner, input),
       );
     } catch (error) {
       // A concurrent retry may have placed this order while this transaction waited.
@@ -53,7 +63,7 @@ export class OrdersService {
 
   private async placeWithinTransaction(
     transaction: Prisma.TransactionClient,
-    userId: number,
+    owner: OrderOwner,
     input: OrderInput,
   ) {
     const products = await transaction.product.findMany({
@@ -86,7 +96,9 @@ export class OrdersService {
 
     const order = await transaction.order.create({
       data: {
-        userId,
+        ...('userId' in owner
+          ? { userId: owner.userId }
+          : { guestKey: owner.guestKey, confirmation: { create: { email: owner.email } } }),
         requestId: input.requestId,
         customerName: input.customerName,
         phone: input.phone,

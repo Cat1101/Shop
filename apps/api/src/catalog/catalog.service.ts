@@ -12,4 +12,8 @@ export class CatalogService {
   async listProducts(category?: string) {
     return this.repository.listProducts(category);
   }
+
+  async findProduct(slug: string) {
+    return this.repository.findProduct(slug);
+  }
 }

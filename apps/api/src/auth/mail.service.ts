@@ -12,6 +12,16 @@ export class MailService {
     socketTimeout: 8_000,
   });
 
+  async sendOrderConfirmation(email: string, orderId: string, text: string) {
+    await this.transport.sendMail({
+      from: process.env.MAIL_FROM ?? 'MicroShop <no-reply@microshop.test>',
+      to: email,
+      messageId: `<order-${orderId}@microshop.test>`,
+      subject: 'Ваш заказ принят · MicroShop',
+      text,
+    });
+  }
+
   async sendVerification(email: string, token: string) {
     const link = new URL('/verify-email', process.env.WEB_ORIGIN ?? 'http://localhost:3000');
     link.searchParams.set('token', token);

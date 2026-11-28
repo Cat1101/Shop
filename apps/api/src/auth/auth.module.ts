@@ -9,6 +9,6 @@ import { MailService } from './mail.service';
   imports: [DatabaseModule, ThrottlerModule.forRoot([{ ttl: 60_000, limit: 12 }])],
   controllers: [AuthController],
   providers: [AuthService, MailService],
-  exports: [AuthService],
+  exports: [AuthService, MailService],
 })
 export class AuthModule {}

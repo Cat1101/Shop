@@ -66,8 +66,9 @@ enum OrderStatus {
 
 model Order {
   id           String      @id @default(uuid()) @db.Uuid
-  userId       Int
-  user         User        @relation(fields: [userId], references: [id])
+  userId       Int?
+  user         User?       @relation(fields: [userId], references: [id], onDelete: Restrict)
+  guestKey     String?     @db.Uuid
   requestId    String      @db.Uuid
   customerName String
   phone        String
@@ -75,9 +76,22 @@ model Order {
   totalKopecks Int
   createdAt    DateTime    @default(now())
   items        OrderItem[]
+  confirmation OrderConfirmation?
 
   @@unique([userId, requestId])
+  @@unique([guestKey, requestId])
   @@index([userId, createdAt])
+}
+
+model OrderConfirmation {
+  orderId       String    @id @db.Uuid
+  order         Order     @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  email         String    @db.VarChar(254)
+  attempts      Int       @default(0)
+  nextAttemptAt DateTime  @default(now())
+  sentAt        DateTime?
+
+  @@index([sentAt, nextAttemptAt])
 }
 
 model OrderItem {
